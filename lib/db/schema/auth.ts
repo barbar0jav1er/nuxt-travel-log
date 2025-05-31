@@ -6,16 +6,16 @@ export const user = sqliteTable("user", {
   email: text().notNull().unique(),
   emailVerified: integer({ mode: "boolean" }).$defaultFn(() => false).notNull(),
   image: text(),
-  createdAt: integer().$defaultFn(() => Date.now()).notNull(),
-  updatedAt: integer().$defaultFn(() => Date.now()).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()).notNull(),
 });
 
 export const session = sqliteTable("session", {
   id: int().primaryKey({ autoIncrement: true }),
-  expiresAt: integer().notNull(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
   token: text().notNull().unique(),
-  createdAt: integer().notNull(),
-  updatedAt: integer().notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
   ipAddress: text(),
   userAgent: text(),
   userId: text().notNull().references(() => user.id, { onDelete: "cascade" }),
@@ -29,19 +29,19 @@ export const account = sqliteTable("account", {
   accessToken: text(),
   refreshToken: text(),
   idToken: text(),
-  accessTokenExpiresAt: integer(),
-  refreshTokenExpiresAt: integer(),
+  accessTokenExpiresAt: integer("access_token_expires_at", { mode: "timestamp" }),
+  refreshTokenExpiresAt: integer("refresh_token_expires_at", { mode: "timestamp" }),
   scope: text(),
   password: text(),
-  createdAt: integer().notNull(),
-  updatedAt: integer().notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
 
 export const verification = sqliteTable("verification", {
   id: int().primaryKey({ autoIncrement: true }),
   identifier: text().notNull(),
   value: text().notNull(),
-  expiresAt: integer().notNull(),
-  createdAt: integer().$defaultFn(() => Date.now()),
-  updatedAt: integer().$defaultFn(() => Date.now()),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => /* @__PURE__ */ new Date()),
 });

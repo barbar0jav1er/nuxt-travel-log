@@ -37,3 +37,9 @@ Locally preview production build:
 ```bash
 pnpm preview
 ```
+
+## Generate auth migration
+
+```bash
+pnpm dlx @better-auth/cli@latest generate --config better-auth.config.ts
+```

@@ -7,9 +7,11 @@ export default defineConfig({
   out: "./lib/db/migrations",
   schema: "./lib/db/schema/index.ts",
   casing: "snake_case",
-  dialect: "turso",
+  dialect: "sqlite",
+  driver: "d1-http",
   dbCredentials: {
-    url: env.TURSO_DATABASE_URL,
-    authToken: env.NODE_ENV === "development" ? undefined : env.TURSO_DATABASE_AUTH_TOKEN,
+    accountId: env.CLOUDFLARE_ACCOUNT_ID,
+    databaseId: env.CLOUDFLARE_DATABASE_ID,
+    token: env.CLOUDFLARE_D1_TOKEN,
   },
 });
