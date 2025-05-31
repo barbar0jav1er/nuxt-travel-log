@@ -5,8 +5,9 @@
   "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977",
   "scripts": {
     "build": "nuxt build",
-    "dev": "concurrently \"nuxt dev\" \"pnpm run dev:db\"",
+    "dev": "nuxt dev",
     "dev:db": "turso dev --db-file local.db",
+    "deploy": "pnpm run build && wrangler deploy",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.13.2",
+    "@cloudflare/workers-types": "^4.20250529.0",
     "@iconify-json/tabler": "^1.2.18",
     "concurrently": "^9.1.2",
     "daisyui": "^5.0.38",
@@ -40,6 +42,7 @@
     "eslint-plugin-format": "^1.0.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.0",
+    "nitro-cloudflare-dev": "^0.2.2",
     "wrangler": "^4.17.0"
   },
   "lint-staged": {
