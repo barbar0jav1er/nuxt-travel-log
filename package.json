@@ -5,14 +5,19 @@
   "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977",
   "scripts": {
     "build": "nuxt build",
-    "dev": "concurrently \"nuxt dev\" \"pnpm run dev:db\"",
-    "dev:db": "turso dev --db-file local.db",
+    "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply nuxt-travel-log --local",
+    "db:migrate:prod": "wrangler d1 migrations apply nuxt-travel-log",
+    "db:studio": "drizzle-kit studio",
+    "deploy": "pnpm run build && wrangler deploy",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@libsql/client": "^0.15.7",
@@ -33,14 +38,16 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.13.2",
     "@iconify-json/tabler": "^1.2.18",
-    "concurrently": "^9.1.2",
     "daisyui": "^5.0.38",
     "drizzle-kit": "^0.31.1",
     "eslint": "^9.27.0",
     "eslint-plugin-format": "^1.0.1",
+    "h3": "^1.15.3",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.0",
-    "wrangler": "^4.17.0"
+    "nitro-cloudflare-dev": "^0.2.2",
+    "nitropack": "^2.11.12",
+    "wrangler": "^4.18.0"
   },
   "lint-staged": {
     "*": "pnpm lint"

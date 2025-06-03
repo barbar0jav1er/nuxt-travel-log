@@ -1,5 +1,6 @@
 import { auth } from "~/lib/auth";
 
 export default defineEventHandler((event) => {
-  return auth.handler(toWebRequest(event));
+  const { DB, ...cloudflareEnv } = event.context.cloudflare.env;
+  return auth(DB, cloudflareEnv).handler(toWebRequest(event));
 });
