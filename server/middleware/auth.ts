@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     const { DB, ...cloudflareEnv } = event.context.cloudflare.env;
     const session = await auth(DB, cloudflareEnv).api.getSession({ headers: event.headers });
 
-    if (!session) {
+    if (!session?.user) {
       await sendRedirect(event, "/", 302);
     }
   }

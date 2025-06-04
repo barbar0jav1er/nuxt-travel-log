@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { createAuthMiddleware } from "better-auth/api";
 
 import { createDB } from "./../db";
 import { getEnv } from "./../env";
@@ -10,6 +11,19 @@ export function auth(DB: D1Database, cloudflareEnv: Partial<Env>): ReturnType<ty
   const env = getEnv(cloudflareEnv);
   return betterAuth({
     ...betterAuthOptions,
+    hooks: {
+      after: createAuthMiddleware(async (ctx) => {
+        if (ctx.path === "/get-session") {
+          if (!ctx.context.session) {
+            return ctx.json({
+              session: null,
+              user: null,
+            });
+          }
+          return ctx.json(ctx.context.session);
+        }
+      }),
+    },
     database: drizzleAdapter(db, { provider: "sqlite" }),
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
