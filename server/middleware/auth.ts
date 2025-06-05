@@ -1,9 +1,11 @@
 import { auth } from "~/lib/auth";
 
 export default defineEventHandler(async (event) => {
+  const { db, cloudflare } = event.context;
+  const { DB: _, ...cloudflareEnv } = cloudflare.env;
+  const session = await auth(db, cloudflareEnv).api.getSession({ headers: event.headers });
+  event.context.user = session?.user;
   if (event.path.startsWith("/dashboard")) {
-    const { DB, ...cloudflareEnv } = event.context.cloudflare.env;
-    const session = await auth(DB, cloudflareEnv).api.getSession({ headers: event.headers });
     //
     if (!session?.user) {
       await sendRedirect(event, "/", 302);
