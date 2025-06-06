@@ -1,3 +1,5 @@
+import type { User } from "better-auth";
+
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
@@ -7,7 +9,12 @@ import type { CreateDB } from "./../db";
 import { getEnv } from "./../env";
 import { betterAuthOptions } from "./options";
 
-export function auth(db: ReturnType<typeof CreateDB>, cloudflareEnv: Partial<Env>): ReturnType<typeof betterAuth> {
+// because we are using number instead the string provide by better auth
+export type UserWithId = Omit<User, "id"> & {
+  id: number;
+};
+
+export function auth(db: CreateDB, cloudflareEnv: Partial<Env>): ReturnType<typeof betterAuth> {
   const env = getEnv(cloudflareEnv);
   return betterAuth({
     ...betterAuthOptions,
