@@ -2,7 +2,7 @@
 
 import type { User } from "better-auth";
 
-import type { createDB } from "./lib/db";
+import type { CreateDB } from "./lib/db";
 
 declare module "h3" {
   // eslint-disable-next-line ts/consistent-type-definitions
@@ -11,7 +11,7 @@ declare module "h3" {
     user?: Omit<User, "id"> & {
       id: number;
     };
-    db: ReturnType<typeof createDB>;
+    db: ReturnType<typeof CreateDB>;
     cloudflare: {
       request: Request;
       env: Env;

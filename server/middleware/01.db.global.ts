@@ -1,7 +1,7 @@
-import { createDB } from "~/lib/db";
+import { CreateDB } from "~/lib/db";
 
 export default defineEventHandler(async (event) => {
   const { DB } = event.context.cloudflare.env;
-  const db = createDB(DB);
+  const db = CreateDB(DB);
   event.context.db = db;
 });
