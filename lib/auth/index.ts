@@ -2,12 +2,12 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 
-import type { createDB } from "./../db";
+import type { CreateDB } from "./../db";
 
 import { getEnv } from "./../env";
 import { betterAuthOptions } from "./options";
 
-export function auth(db: ReturnType<typeof createDB>, cloudflareEnv: Partial<Env>): ReturnType<typeof betterAuth> {
+export function auth(db: ReturnType<typeof CreateDB>, cloudflareEnv: Partial<Env>): ReturnType<typeof betterAuth> {
   const env = getEnv(cloudflareEnv);
   return betterAuth({
     ...betterAuthOptions,
