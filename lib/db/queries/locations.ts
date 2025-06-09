@@ -8,6 +8,24 @@ import { location } from "../schema";
 
 const nanoid = customAlphabet("123456890abcdefghijklmnopqrstuvwxyz", 5);
 
+export async function findLocation(db: CreateDB, slug: string, userId: number) {
+  return db.query.location.findFirst({
+    where: and(
+      eq(location.slug, slug),
+      eq(location.userId, userId),
+    ),
+    with: {
+      locationLogs: true,
+    },
+  });
+}
+
+export async function findLocations(db: CreateDB, userId: number) {
+  return db.query.location.findMany({
+    where: eq(location.userId, userId),
+  });
+}
+
 export async function findLocationByName(db: CreateDB, existing: InsertLocation, userId: number) {
   return db.query.location.findFirst({
     where: and(
@@ -45,10 +63,4 @@ export async function insertLocation(db: CreateDB, insertable: InsertLocation, s
     userId,
   }).returning();
   return created;
-}
-
-export async function findLocations(db: CreateDB, userId: number) {
-  return db.query.location.findMany({
-    where: eq(location.userId, userId),
-  });
 }

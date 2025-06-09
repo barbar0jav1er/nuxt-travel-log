@@ -7,6 +7,7 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "typecheck": "nuxi typecheck",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply nuxt-travel-log --local",
     "db:migrate:prod": "wrangler d1 migrations apply nuxt-travel-log --remote",
@@ -58,6 +59,7 @@
     "lint-staged": "^16.1.0",
     "nitro-cloudflare-dev": "^0.2.2",
     "nitropack": "^2.11.12",
+    "vue-tsc": "^2.2.10",
     "wrangler": "^4.18.0"
   },
   "lint-staged": {
