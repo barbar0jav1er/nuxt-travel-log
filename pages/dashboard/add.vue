@@ -1,33 +1,18 @@
 <script setup lang="ts">
 import type { FetchError } from "ofetch";
 
-import { toTypedSchema } from "@vee-validate/zod";
-import { AppPlaceSearch } from "#components";
+import type { InsertLocation } from "~/lib/db/schema";
 
-import type { NominatimResult } from "~/lib/types";
-
-import { CENTER_USA } from "~/lib/constants";
-import { InsertLocation } from "~/lib/db/schema";
-
-const router = useRouter();
+const { $csrfFetch } = useNuxtApp();
 const submitError = ref("");
 const loading = ref(false);
 const submitted = ref(false);
-const mapStore = useMapStore();
-const { $csrfFetch } = useNuxtApp();
-const { handleSubmit, errors, meta, setErrors, setFieldValue, controlledValues } = useForm({
-  validationSchema: toTypedSchema(InsertLocation),
-  initialValues: {
-    name: "",
-    description: "",
-    long: (CENTER_USA as [number, number])[0],
-    lat: (CENTER_USA as [number, number])[1],
-  },
-});
+const submitErrors = ref<Record<string, string>>({});
 
-const onSubmit = handleSubmit(async (values) => {
+async function onSubmit(values: InsertLocation) {
   try {
     submitError.value = "";
+    submitErrors.value = {};
     loading.value = true;
     await $csrfFetch("/api/locations", {
       method: "post",
@@ -39,59 +24,11 @@ const onSubmit = handleSubmit(async (values) => {
   catch (e) {
     const error = e as FetchError;
     if (error.data.data) {
-      setErrors(error.data?.data);
+      submitError.value = error.data?.data;
     }
     submitError.value = getFetchErrorMessage(error);
   }
   loading.value = false;
-});
-
-onMounted(() => {
-  mapStore.addedPoint = {
-    long: (CENTER_USA as [number, number])[0],
-    lat: (CENTER_USA as [number, number])[1],
-    description: "",
-    name: "Added Point",
-    id: 1,
-  };
-});
-
-onBeforeRouteLeave(() => {
-  if (meta.value.dirty && !submitted.value) {
-  // eslint-disable-next-line no-alert
-    const confirm = window.confirm("Are you sure you eant to leave? All unsaved changes will be lose");
-    if (!confirm)
-      return false;
-  }
-
-  mapStore.addedPoint = null;
-  return true;
-});
-
-function formatNumber(value?: number) {
-  if (!value)
-    return 0;
-  return value.toFixed(5);
-}
-
-effect(() => {
-  if (mapStore.addedPoint) {
-    setFieldValue("lat", mapStore.addedPoint.lat);
-    setFieldValue("long", mapStore.addedPoint.long);
-  }
-});
-
-function searchResultSelected(result: NominatimResult) {
-  setFieldValue("name", result.display_name);
-
-  mapStore.addedPoint = {
-    long: Number(result.lon),
-    lat: Number(result.lat),
-    description: "",
-    name: "Added Point",
-    id: 1,
-    centerMap: true,
-  };
 }
 </script>
 
@@ -112,58 +49,11 @@ function searchResultSelected(result: NominatimResult) {
     >
       <span>{{ submitError }}</span>
     </div>
-    <form class="flex flex-col gap-2" @submit.prevent="onSubmit">
-      <AppFormField
-        name="name"
-        :error="errors.name"
-        label="Name"
-        :disabled="loading"
-      />
-      <AppFormField
-        name="description"
-        type="textarea"
-        :error="errors.description"
-        label="Description"
-        :disabled="loading"
-      />
-      <p class="text-xs text-gray-400">
-        Current coordinates: {{ formatNumber(controlledValues.lat) }}, {{ formatNumber (controlledValues.long) }}
-      </p>
-      <p>To set the coordinates:</p>
-      <ul class="list-disc ml-4 text-sm">
-        <li>
-          Drag the <Icon name="tabler:map-pin-filled" class="text-warning" /> marker on the map.
-        </li>
-        <li>Double click on the map</li>
-        <li>Search for a location bellow.</li>
-      </ul>
-
-      <div class="flex justify-end gap-2">
-        <button
-          :disabled="loading"
-          class="btn btn-outline"
-          type="button"
-          @click="router.back()"
-        >
-          <Icon name="tabler:arrow-left" size="24" />
-          Cancel
-        </button>
-        <button
-          :disabled="loading"
-          class="btn btn-primary"
-          type="submit"
-        >
-          Add
-          <span v-if="loading" class="loading loading-spinner loading-sm" />
-          <Icon
-            v-else
-            name="tabler:circle-plus-filled"
-            size="24"
-          />
-        </button>
-      </div>
-    </form>
-    <div class="divider" />
-    <AppPlaceSearch @result-selected="searchResultSelected" />
+    <LocationForm
+      :submitted
+      :loading
+      :on-submit
+      :submit-errors
+    />
   </div>
 </template>

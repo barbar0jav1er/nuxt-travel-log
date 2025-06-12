@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CURRENT_LOCATION_PAGES, EDIT_PAGES, LOCATION_PAGES } from "~/lib/constants";
+
 const isSidebarOpen = ref(true);
 const route = useRoute();
 const sidebarStore = useSidebarStore();
@@ -7,15 +9,16 @@ const mapStore = useMapStore();
 
 const { currentLocation } = storeToRefs(locationsStore);
 
-onMounted(() => {
-  isSidebarOpen.value = localStorage.getItem("isSidebarOpen") === "true";
-  if (route.path !== "/dashboard") {
-    locationsStore.refreshLocations();
-  }
-});
+if (LOCATION_PAGES.has(route.name?.toString() || "")) {
+  await locationsStore.refreshLocations();
+}
+
+if (CURRENT_LOCATION_PAGES.has(route.name?.toString() || "")) {
+  await locationsStore.refreshCurrentLocation();
+}
 
 effect(() => {
-  if (route.name === "dashboard") {
+  if (LOCATION_PAGES.has(route.name?.toString() || "")) {
     sidebarStore.sidebarTopItems = [{
       id: "link-dashboard",
       label: "Locations",
@@ -28,7 +31,7 @@ effect(() => {
       icon: "tabler:circle-plus-filled",
     }];
   }
-  else if (route.name === "dashboard-location-slug") {
+  else if (CURRENT_LOCATION_PAGES.has(route.name?.toString() || "")) {
     sidebarStore.sidebarTopItems = [
       {
         id: "link-back-to-locations",
@@ -135,7 +138,12 @@ function toggleSidebar() {
       </div>
     </div>
     <div class="flex-1 overflow-auto bg-base-200">
-      <div class="flex size-full" :class="{ 'flex-col': route.path !== '/dashboard/add' }">
+      <div
+        class="flex size-full"
+        :class="{
+          'flex-col': EDIT_PAGES.has(route.name?.toString() || ''),
+        }"
+      >
         <NuxtPage />
         <AppMap class="flex-1" />
       </div>
