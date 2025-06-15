@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { FetchError } from "ofetch";
+
 import { toTypedSchema } from "@vee-validate/zod";
 import { AppPlaceSearch } from "#components";
 
@@ -8,12 +10,16 @@ import { CENTER_USA } from "~/lib/constants";
 import { InsertLocation } from "~/lib/db/schema";
 
 const props = defineProps<{
+  submitLabel: string;
+  submitIcon: string;
+  onSubmitComplete: () => void;
   initialValues?: InsertLocation | null;
   onSubmit: (location: InsertLocation) => Promise<any>;
-  loading: boolean;
-  submitted: boolean;
-  submitErrors: Record<string, string>;
 }>();
+
+const submitError = ref("");
+const loading = ref(false);
+const submitted = ref(false);
 
 const router = useRouter();
 
@@ -23,13 +29,29 @@ const { handleSubmit, errors, meta, setErrors, setFieldValue, controlledValues }
   validationSchema: toTypedSchema(InsertLocation),
   initialValues: {
     name: props.initialValues?.name || "",
-    description: props.initialValues?.name || "",
+    description: props.initialValues?.description || "",
     long: props.initialValues?.long || (CENTER_USA as [number, number])[0],
     lat: props.initialValues?.lat || (CENTER_USA as [number, number])[1],
   },
 });
 
-const onSubmit = handleSubmit(props.onSubmit);
+const onSubmit = handleSubmit(async (values: InsertLocation) => {
+  try {
+    submitError.value = "";
+    loading.value = true;
+    await props.onSubmit(values);
+    submitted.value = true;
+    props.onSubmitComplete();
+  }
+  catch (e) {
+    const error = e as FetchError;
+    if (error.data.data) {
+      setErrors(error.data?.data);
+    }
+    submitError.value = getFetchErrorMessage(error);
+  }
+  loading.value = false;
+});
 
 function formatNumber(value?: number) {
   if (!value)
@@ -51,10 +73,6 @@ function searchResultSelected(result: NominatimResult) {
 }
 
 effect(() => {
-  setErrors(props.submitErrors);
-});
-
-effect(() => {
   if (mapStore.addedPoint) {
     setFieldValue("lat", mapStore.addedPoint.lat);
     setFieldValue("long", mapStore.addedPoint.long);
@@ -72,7 +90,7 @@ onMounted(() => {
 });
 
 onBeforeRouteLeave(() => {
-  if (meta.value.dirty && !props.submitted) {
+  if (meta.value.dirty && !submitted.value) {
   // eslint-disable-next-line no-alert
     const confirm = window.confirm("Are you sure you eant to leave? All unsaved changes will be lose");
     if (!confirm)
@@ -85,6 +103,13 @@ onBeforeRouteLeave(() => {
 </script>
 
 <template>
+  <div
+    v-if="submitError"
+    role="alert"
+    class="alert alert-error"
+  >
+    <span>{{ submitError }}</span>
+  </div>
   <form class="flex flex-col gap-2" @submit.prevent="onSubmit">
     <AppFormField
       name="name"
@@ -126,11 +151,11 @@ onBeforeRouteLeave(() => {
         class="btn btn-primary"
         type="submit"
       >
-        Add
+        {{ props.submitLabel }}
         <span v-if="loading" class="loading loading-spinner loading-sm" />
         <Icon
           v-else
-          name="tabler:circle-plus-filled"
+          :name="submitIcon"
           size="24"
         />
       </button>

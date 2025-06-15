@@ -2,44 +2,34 @@
 import type { InsertLocation } from "~/lib/db/schema";
 
 const locationStore = useLocationStore();
+const route = useRoute();
 
 const { $csrfFetch } = useNuxtApp();
-const submitError = ref("");
-const loading = ref(false);
-const submitted = ref(false);
-const submitErrors = ref<Record<string, string>>({});
 
 async function onSubmit(values: InsertLocation) {
-  console.log(values);
+  await $csrfFetch(`/api/locations/${route.params.slug}`, {
+    method: "put",
+    body: values,
+  });
+}
 
-//   try {
-//     submitError.value = "";
-//     submitErrors.value = {};
-//     loading.value = true;
-//     await $csrfFetch("/api/locations", {
-//       method: "post",
-//       body: values,
-//     });
-//     submitted.value = true;
-//     navigateTo("/dashboard");
-//   }
-//   catch (e) {
-//     const error = e as FetchError;
-//     if (error.data.data) {
-//       submitError.value = error.data?.data;
-//     }
-//     submitError.value = getFetchErrorMessage(error);
-//   }
-//   loading.value = false;
+function onSubmitComplete() {
+  navigateTo({
+    name: "dashboard-location-slug",
+    params: {
+      slug: route.params.slug,
+    },
+  });
 }
 </script>
 
 <template>
   <LocationForm
-    :submitted
-    :loading
+    v-if="locationStore.currentLocationStatus !== 'pending'"
     :on-submit
-    :submit-errors
+    :on-submit-complete
     :initial-values="locationStore.currentLocation"
+    submit-label="Update"
+    submit-icon="tabler:map-pin-up"
   />
 </template>
