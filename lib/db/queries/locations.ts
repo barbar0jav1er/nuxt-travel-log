@@ -15,7 +15,11 @@ export async function findLocation(db: CreateDB, slug: string, userId: number) {
       eq(location.userId, userId),
     ),
     with: {
-      locationLogs: true,
+      locationLogs: {
+        orderBy: (field, operators) => {
+          return operators.desc(field.startedAt);
+        },
+      },
     },
   });
 }
