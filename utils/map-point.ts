@@ -1,4 +1,4 @@
-import type { SelectLocation } from "~/lib/db/schema";
+import type { SelectLocation, SelectLocationLog } from "~/lib/db/schema";
 import type { MapPoint } from "~/lib/types";
 
 export function createMapPointFromLocation(location: SelectLocation): MapPoint {
@@ -16,4 +16,12 @@ export function isPointSelected(item: Pick<MapPoint, "id" | "lat" | "long"> | nu
   return item.id === selectedPoint.id
     && item.lat === selectedPoint.lat
     && item.long === selectedPoint.long;
+}
+
+export function createMapPointFromLocationLog(locationLog: SelectLocationLog): MapPoint {
+  return {
+    ...locationLog,
+    to: { name: "dashboard-location-slug-id", params: { id: locationLog.id } },
+    toLabel: "View",
+  };
 }
