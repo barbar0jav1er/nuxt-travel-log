@@ -108,7 +108,7 @@ onBeforeRouteUpdate((to) => {
         </NuxtLink>
       </div>
       <div
-        v-if="location.locationLogs.length"
+        v-if="location.locationLogs.length && !loading"
         class="location-list"
       >
         <LocationCard
