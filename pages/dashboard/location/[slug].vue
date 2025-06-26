@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { FetchError } from "ofetch";
 
-const locationStore = useLocationStore();
 const route = useRoute();
-const isOpen = ref(false);
+const locationStore = useLocationStore();
 const {
   currentLocation: location,
   currentLocationStatus: status,
   currentLocationError: error,
 } = storeToRefs(locationStore);
 
+const isOpen = ref(false);
 const deleteError = ref("");
 const isDeleting = ref(false);
 
