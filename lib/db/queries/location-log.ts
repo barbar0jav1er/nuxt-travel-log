@@ -31,12 +31,22 @@ export async function findLocationLogById(db: CreateDB, id: number, useId: numbe
 }
 
 export async function updateLocationLog(db: CreateDB, id: number, updatable: InsertLocationLog, useId: number) {
-  const updated = await db.update(locationLog)
-    .set({ ...updatable })
+  const [updated] = await db.update(locationLog)
+    .set(updatable)
     .where(and(
       eq(locationLog.id, id),
       eq(locationLog.userId, useId),
-    ));
+    ))
+    .returning();
 
   return updated;
+}
+
+export async function deleteLocationLog(db: CreateDB, id: number, useId: number) {
+  const [deleted] = await db.delete(locationLog).where(and(
+    eq(locationLog.id, id),
+    eq(locationLog.userId, useId),
+  )).returning();
+
+  return deleted;
 }
