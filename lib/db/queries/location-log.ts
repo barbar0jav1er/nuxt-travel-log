@@ -29,3 +29,14 @@ export async function findLocationLogById(db: CreateDB, id: number, useId: numbe
   });
   return foundLocationLog;
 }
+
+export async function updateLocationLog(db: CreateDB, id: number, updatable: InsertLocationLog, useId: number) {
+  const updated = await db.update(locationLog)
+    .set({ ...updatable })
+    .where(and(
+      eq(locationLog.id, id),
+      eq(locationLog.userId, useId),
+    ));
+
+  return updated;
+}
