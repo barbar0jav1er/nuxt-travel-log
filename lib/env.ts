@@ -13,6 +13,12 @@ const EnvSchema = z.object({
   CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
   CLOUDFLARE_DATABASE_ID: z.string().optional(),
   CLOUDFLARE_D1_TOKEN: z.string().optional(),
+
+  S3_ENDPOINT: z.string(),
+  S3_ACCESS_KEY: z.string(),
+  S3_ACCESS_SECRET: z.string(),
+  S3_REGION: z.string(),
+  S3_BUCKET: z.string(),
 });
 
 export type EnvSchema = z.infer<typeof EnvSchema>;
